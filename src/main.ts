@@ -1,9 +1,18 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true, // Strip non-whitelisted fields
+      forbidNonWhitelisted: true, // Throw errors for non-whitelisted fields
+      transform: true, // Auto-transform payloads to DTO instances
+    }),
+  );
 
   const config = new DocumentBuilder()
     .setTitle('Delivery API')
@@ -18,4 +27,11 @@ async function bootstrap() {
 
   await app.listen(process.env.PORT ?? 3000);
 }
-bootstrap();
+bootstrap()
+  .then(() => {
+    console.log(`🚀 Application running on port ${process.env.PORT || 3000}`);
+  })
+  .catch((err) => {
+    console.error('❌ Application failed to start', err);
+    process.exit(1);
+  });

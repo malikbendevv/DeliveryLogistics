@@ -162,17 +162,16 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
-  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
         "fromEnvVar": "DATABASE_URL",
-        "value": null
+        "value": "postgresql://postgres:postgres@localhost:5432/mydb?schema=public"
       }
     }
   },
-  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider        = \"prisma-client-js\"\n  output          = \"../generated/prisma\"\n  previewFeatures = [\"prismaSchemaFolder\"]\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel User {\n  id          String   @id @default(uuid()) // Better than auto-increment for security\n  firstName   String\n  lastName    String\n  email       String   @unique // Ensures no duplicate emails\n  password    String // Will be hashed (see note below)\n  phoneNumber String   @unique // Optional, but unique if provided\n  address     String?\n  role        String   @default(\"CUSTOMER\") // \"CUSTOMER\", \"DRIVER\", \"ADMIN\"\n  createdAt   DateTime @default(now())\n  updatedAt   DateTime @updatedAt\n  //   orders       Order[]                        // Relation to orders (optional)\n\n  // Indexes for faster queries\n  @@index([email])\n  @@index([phoneNumber])\n}\n",
-  "inlineSchemaHash": "6e3cc5608a918e52a40220350df45e67f01daca865d8bb03de7d3ff7d0869e51",
+  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider        = \"prisma-client-js\"\n  output          = \"../generated/prisma\"\n  previewFeatures = [\"prismaSchemaFolder\"]\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel User {\n  id          String   @id @default(uuid()) // Better than auto-increment for security\n  firstName   String\n  lastName    String\n  email       String   @unique // Ensures no duplicate emails\n  password    String // Will be hashed (see note below)\n  phoneNumber String   @unique // Optional, but unique if provided\n  address     String?\n  role        String   @default(\"CUSTOMER\") // \"CUSTOMER\", \"DRIVER\", \"ADMIN\"\n  createdAt   DateTime @default(now())\n  updatedAt   DateTime @updatedAt\n  //   orders       Order[]                        // Relation to orders (optional)\n\n  // Indexes for faster queries\n  @@index([id])\n  @@index([email])\n  @@index([phoneNumber])\n}\n",
+  "inlineSchemaHash": "cf884311c4a5b3688731bb10b43579c6b43c4cfe1ae42824f2044c54c7238c1c",
   "copyEngine": true
 }
 config.dirname = '/'

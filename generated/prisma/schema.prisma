@@ -29,6 +29,7 @@ model User {
   //   orders       Order[]                        // Relation to orders (optional)
 
   // Indexes for faster queries
+  @@index([id])
   @@index([email])
   @@index([phoneNumber])
 }
