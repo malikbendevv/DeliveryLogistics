@@ -8,9 +8,12 @@ async function bootstrap() {
 
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true, // Strip non-whitelisted fields
-      forbidNonWhitelisted: true, // Throw errors for non-whitelisted fields
-      transform: true, // Auto-transform payloads to DTO instances
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
     }),
   );
 
@@ -27,6 +30,7 @@ async function bootstrap() {
 
   await app.listen(process.env.PORT ?? 3000);
 }
+
 bootstrap()
   .then(() => {
     console.log(`🚀 Application running on port ${process.env.PORT || 3000}`);

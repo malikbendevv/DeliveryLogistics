@@ -8,12 +8,14 @@ import {
   Delete,
   Logger,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiOperation, ApiTags, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiTags, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { UserDto } from './dto/user.dto';
+import { UserQueryDto } from './dto/user-query.dto';
 
 @ApiTags('Users')
 @Controller('users')
@@ -47,9 +49,15 @@ export class UsersController {
     description: 'Array of users',
     type: [UserDto],
   })
+
+  // users.controller.ts
+  @ApiOperation({ summary: 'Get users with pagination/filters' })
+  @ApiQuery({ type: UserQueryDto })
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  async getUsers(@Query() query: UserQueryDto) {
+    console.log('query', query);
+
+    return this.usersService.findAll(query);
   }
 
   @ApiOperation({ summary: 'Get user by ID' })

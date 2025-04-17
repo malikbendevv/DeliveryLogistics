@@ -10,12 +10,16 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/shared/prisma/prisma.service';
 
 import * as bcrypt from 'bcrypt';
+import { UserQueryDto } from './dto/user-query.dto';
 
 type UserCreateResponse = {
   id: string;
   email: string;
   firstName: string;
-  // Add other fields you SELECT
+  lastName: string;
+  role: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 };
 
 @Injectable()
@@ -60,6 +64,9 @@ export class UsersService {
           id: true,
           email: true,
           firstName: true,
+          lastName: true,
+          role: true,
+          createdAt: true,
         },
       });
 
@@ -70,14 +77,35 @@ export class UsersService {
     }
   }
 
-  async findAll(skip = 0, take = 10) {
+  async findAll(query: UserQueryDto) {
+    const { page = 1, limit = 10, role, search } = query;
+
+    this.logger.log('Logging query in user service', query);
+    this.logger.log('Logging skip in user service', page - 1 * limit);
     return await this.prisma.user.findMany({
-      skip,
-      take,
+      skip: (page - 1) * limit,
+      take: limit,
+      where: {
+        ...(role && { role }),
+
+        ...(search && {
+          OR: search
+            ? [
+                { firstName: { contains: search, mode: 'insensitive' } },
+
+                { lastName: { contains: search, mode: 'insensitive' } },
+
+                { email: { contains: search, mode: 'insensitive' } },
+              ]
+            : undefined,
+        }),
+      },
+
       select: {
         id: true,
         email: true,
         firstName: true,
+        lastName: true,
         role: true,
       },
       orderBy: { createdAt: 'desc' },
