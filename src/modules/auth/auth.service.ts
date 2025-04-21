@@ -1,10 +1,6 @@
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
-import {
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from 'src/shared/prisma/prisma.service';
 import { LoginDto } from './dto/login.dto';
@@ -56,8 +52,15 @@ export class AuthService {
     return { accessToken: newAccessToken };
   }
 
-  async login(user: LoginDto) {
-    const payload = { email: user.email };
+  async login(dto: LoginDto) {
+    const user = await this.validateUser(dto.email, dto.password);
+    if (!user) throw new UnauthorizedException('Invalid credentials');
+
+    const payload = {
+      sub: user.id,
+      email: user.email,
+      role: user.role,
+    };
 
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {
@@ -77,12 +80,15 @@ export class AuthService {
       select: { id: true },
     });
 
-    return {
-      accessToken,
-      refreshToken,
-      user: {
-        email: user.email,
-      },
-    };
+    return { accessToken, refreshToken };
+  }
+
+  async logout(userId: string) {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { refreshToken: null },
+    });
+
+    return { message: 'Logged out successfully' };
   }
 }
