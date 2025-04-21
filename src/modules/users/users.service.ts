@@ -119,8 +119,8 @@ export class UsersService {
         id: true,
         email: true,
         role: true,
+        password: true,
         firstName: true,
-        createdAt: true,
       },
     });
 
@@ -140,6 +140,7 @@ export class UsersService {
         firstName: true,
         lastName: true,
         role: true,
+        refreshToken: true,
         createdAt: true,
       },
     });

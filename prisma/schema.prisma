@@ -6,7 +6,6 @@
 
 generator client {
   provider        = "prisma-client-js"
-  output          = "../generated/prisma"
   previewFeatures = ["prismaSchemaFolder"]
 }
 
@@ -16,18 +15,20 @@ datasource db {
 }
 
 model User {
-  id          String    @id @default(uuid()) // Better than auto-increment for security
-  firstName   String
-  lastName    String
-  email       String    @unique // Ensures no duplicate emails
-  password    String // Will be hashed (see note below)
-  phoneNumber String    @unique // Optional, but unique if provided
-  address     String?
-  role        String    @default("CUSTOMER") // "CUSTOMER", "DRIVER", "ADMIN"
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id           String  @id @default(uuid()) // Better than auto-increment for security
+  firstName    String
+  lastName     String
+  email        String  @unique // Ensures no duplicate emails
+  password     String // Will be hashed (see note below)
+  phoneNumber  String  @unique // Optional, but unique if provided
+  address      String?
+  refreshToken String? @unique
+
+  role      String    @default("CUSTOMER") // "CUSTOMER", "DRIVER", "ADMIN"
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   //   orders       Order[]                        // Relation to orders (optional)
-  Address     Address[]
+  Address   Address[]
 
   // Indexes for faster queries
   @@index([id])
