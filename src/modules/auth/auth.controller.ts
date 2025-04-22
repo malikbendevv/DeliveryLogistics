@@ -18,7 +18,7 @@ import { LoginDto } from './dto/login.dto';
 import { ApiTags, ApiResponse, ApiOperation } from '@nestjs/swagger';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -53,7 +53,7 @@ export class AuthController {
 
   @Post('logout')
   @UseGuards(JwtAuthGuard)
-  async logout(@Req() req, @Res({ passthrough: true }) res: Response) {
+  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     // Clear cookies
     res.clearCookie('access_token');
     res.clearCookie('refresh_token');

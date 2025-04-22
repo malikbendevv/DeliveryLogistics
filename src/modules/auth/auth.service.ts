@@ -4,6 +4,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from 'src/shared/prisma/prisma.service';
 import { LoginDto } from './dto/login.dto';
+import { JwtPayload } from './types/jwt-payload';
 
 @Injectable()
 export class AuthService {
@@ -32,9 +33,12 @@ export class AuthService {
   }
 
   async refreshToken(refreshToken: string) {
-    const payload = await this.jwtService.verifyAsync(refreshToken, {
-      secret: process.env.JWT_REFRESH_SECRET,
-    });
+    const payload: JwtPayload = await this.jwtService.verifyAsync(
+      refreshToken,
+      {
+        secret: process.env.JWT_REFRESH_SECRET,
+      },
+    );
 
     const user = await this.usersService.getById(payload.sub);
     if (
@@ -76,7 +80,7 @@ export class AuthService {
 
     await this.prisma.user.update({
       where: { email: user.email },
-      data: { refreshToken: hashedRefreshToken as string | null },
+      data: { refreshToken: hashedRefreshToken },
       select: { id: true },
     });
 
