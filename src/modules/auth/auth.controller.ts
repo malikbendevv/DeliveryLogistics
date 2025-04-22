@@ -17,7 +17,7 @@ import { LoginDto } from './dto/login.dto';
 
 import { ApiTags, ApiResponse, ApiOperation } from '@nestjs/swagger';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
-import { JwtAuthGuard } from './jwt-auth.guard';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { Request, Response } from 'express';
 
 @ApiTags('Auth')

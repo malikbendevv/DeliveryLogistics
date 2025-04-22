@@ -11,6 +11,7 @@ import { PrismaService } from 'src/shared/prisma/prisma.service';
 
 import * as bcrypt from 'bcrypt';
 import { UserQueryDto } from './dto/user-query.dto';
+import { Role } from '../auth/types/roles.enum';
 
 type UserCreateResponse = {
   id: string;
@@ -86,7 +87,7 @@ export class UsersService {
       skip: (page - 1) * limit,
       take: limit,
       where: {
-        ...(role && { role }),
+        ...(role && { role: role as Role }),
 
         ...(search && {
           OR: search
