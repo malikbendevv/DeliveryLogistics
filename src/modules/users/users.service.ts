@@ -11,6 +11,7 @@ import { PrismaService } from 'src/shared/prisma/prisma.service';
 
 import * as bcrypt from 'bcrypt';
 import { UserQueryDto } from './dto/user-query.dto';
+import { Role } from '../auth/types/roles.enum';
 
 type UserCreateResponse = {
   id: string;
@@ -86,7 +87,7 @@ export class UsersService {
       skip: (page - 1) * limit,
       take: limit,
       where: {
-        ...(role && { role }),
+        ...(role && { role: role as Role }),
 
         ...(search && {
           OR: search
@@ -119,8 +120,8 @@ export class UsersService {
         id: true,
         email: true,
         role: true,
+        password: true,
         firstName: true,
-        createdAt: true,
       },
     });
 
@@ -140,6 +141,7 @@ export class UsersService {
         firstName: true,
         lastName: true,
         role: true,
+        refreshToken: true,
         createdAt: true,
       },
     });
