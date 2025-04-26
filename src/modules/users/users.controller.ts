@@ -9,6 +9,7 @@ import {
   Logger,
   HttpStatus,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -16,6 +17,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiOperation, ApiTags, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { UserDto } from './dto/user.dto';
 import { UserQueryDto } from './dto/user-query.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('Users')
 @Controller('users')
@@ -53,6 +55,7 @@ export class UsersController {
   // users.controller.ts
   @ApiOperation({ summary: 'Get users with pagination/filters' })
   @ApiQuery({ type: UserQueryDto })
+  @UseGuards(JwtAuthGuard)
   @Get()
   async getUsers(@Query() query: UserQueryDto) {
     console.log('query', query);
@@ -71,6 +74,7 @@ export class UsersController {
     description: 'User not found',
   })
   @Get(':id')
+  @UseGuards(JwtAuthGuard)
   findOne(@Param('id') id: string) {
     return this.usersService.getById(id);
   }
@@ -86,6 +90,7 @@ export class UsersController {
     description: 'User not found',
   })
   @Patch(':id')
+  @UseGuards(JwtAuthGuard)
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(id, updateUserDto);
   }
@@ -99,6 +104,7 @@ export class UsersController {
     status: HttpStatus.NOT_FOUND,
     description: 'User not found',
   })
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   delete(@Param('id') id: string) {
     return this.usersService.delete(id);
