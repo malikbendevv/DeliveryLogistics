@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -79,6 +80,23 @@ export class OrdersService {
         estimatedDistance: true,
         estimatedDuration: true,
         dropoffAddressId: true,
+
+        customer: {
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
+        driver: {
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
       },
     });
   }
@@ -98,6 +116,23 @@ export class OrdersService {
         estimatedDistance: true,
         estimatedDuration: true,
         dropoffAddressId: true,
+
+        customer: {
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
+        driver: {
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
       },
     });
 
@@ -107,32 +142,35 @@ export class OrdersService {
   }
 
   async update(payload: {
+    id: string;
     customerId: string;
     updateOrderDto: UpdateOrderDto;
-
-    id: string;
   }) {
-    const { id, updateOrderDto, customerId } = payload;
+    const {
+      id,
+      updateOrderDto,
+      customerId,
+      updateOrderDto: { expectedVersion },
+    } = payload;
 
-    const existingProduct = await this.prisma.order.findFirst({
-      where: { id },
-    });
+    return this.prisma.$transaction(async (tx) => {
+      const order = await tx.order.findUnique({ where: { id } });
+      if (!order) throw new NotFoundException('Order not found');
+      if (order.customerId !== customerId) throw new UnauthorizedException();
 
-    if (!existingProduct) throw new NotFoundException('Order not found');
+      // Idempotency check
+      if (expectedVersion !== undefined && order.version !== expectedVersion) {
+        throw new ConflictException('Order was modified by another request');
+      }
 
-    if (existingProduct.customerId !== customerId)
-      throw new UnauthorizedException(
-        'You are not authorized to update this product',
-      );
-
-    return await this.prisma.order.update({
-      where: { id },
-      data: {
-        ...updateOrderDto,
-      },
-      select: {
-        id: true,
-      },
+      return tx.order.update({
+        where: { id },
+        data: {
+          ...updateOrderDto,
+          version: { increment: 1 }, // 👈 Increment version
+        },
+        select: { id: true, version: true }, // Return new version
+      });
     });
   }
 

@@ -15,8 +15,10 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 import { Request } from 'express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { OrderQueryDto } from './dto/order-query.dto';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { OrderDto } from './dto/order.dto';
+import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from 'src/shared/decorators/roles.decorator';
+import { Role } from 'src/modules/auth/types/roles.enum';
 
 @Controller('orders')
 export class OrdersController {
@@ -64,15 +66,24 @@ export class OrdersController {
 
   @ApiOperation({ summary: 'update order details' })
   @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Order Update',
+    status: HttpStatus.CONFLICT,
+    description: 'Version mismatch (order was modified by another request)',
   })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'User does not own this order',
+  })
+  @ApiBody({
+    description: 'Requires `expectedVersion` for idempotent updates',
+  })
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.admin)
   @Patch(':id')
-  @UseGuards(JwtAuthGuard)
   update(
     @Param('id') id: string,
     @Body() updateOrderDto: UpdateOrderDto,
-    @Req() req: Request,
+    @Req()
+    req: Request,
   ) {
     return this.ordersService.update({
       id,

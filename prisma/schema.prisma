@@ -69,6 +69,7 @@ model Order {
   name              String
   description       String?
   price             Float
+  version           Int         @default(1)
   // Customer relation
   customer          User        @relation("CustomerOrders", fields: [customerId], references: [id])
   customerId        String

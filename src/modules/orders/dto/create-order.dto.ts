@@ -42,6 +42,10 @@ export class CreateOrderDto {
   @IsNumber()
   estimatedDuration: number;
 
+  @IsNotEmpty()
+  @IsNumber()
+  expectedVersion?: number;
+
   @IsOptional()
   @IsBoolean()
   archived: boolean;
